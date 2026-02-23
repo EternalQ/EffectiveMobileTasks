@@ -3,11 +3,13 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"sync"
 	"testing"
 	"testing/quick"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +35,7 @@ func TestDivision(t *testing.T) {
 			a:       10.0,
 			b:       0.0,
 			want:    0.0,
-			wantErr: ErrorDivisionByZero,
+			wantErr: ErrDivisionByZero,
 		},
 	}
 
@@ -55,30 +57,35 @@ func TestSum(t *testing.T) {
 	tests := []struct {
 		name string
 
-		a    []int
-		want int
+		a       []int
+		want    int
+		wantErr error
 	}{
 		{
-			name: "Zero sum",
-			a:    make([]int, 0),
-			want: 0,
+			name:    "Empty input",
+			a:       make([]int, 0),
+			want:    0,
+			wantErr: ErrWrongInput,
 		},
 		{
-			name: "Nil input",
-			a:    nil,
-			want: 0,
+			name:    "Nil input",
+			a:       nil,
+			want:    0,
+			wantErr: ErrWrongInput,
 		},
 		{
-			name: "Normal sum",
-			a:    []int{1, 2, 3, 4, 5},
-			want: 15,
+			name:    "Normal input",
+			a:       []int{1, 2, 3, 4, 5},
+			want:    5,
+			wantErr: nil,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Sum(tt.a...)
+			got, err := Max(tt.a)
 
+			assert.Equal(t, tt.wantErr, err)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -185,6 +192,46 @@ func TestSumHandlerWithServer(t *testing.T) {
 			if result != tt.expected {
 				t.Errorf("Result = %v, want %v", result, tt.expected)
 			}
+		})
+	}
+}
+
+type MockClock struct {
+	hour int
+}
+
+func (m *MockClock) Now() time.Time {
+	str := fmt.Sprintf("%d:00:00", m.hour)
+	time, err := time.Parse(time.TimeOnly, str)
+	if err != nil {
+		panic(err)
+	}
+	return time
+}
+
+func TestGetSuffix(t *testing.T) {
+	tests := []struct {
+		name string
+
+		clock Clock
+		want  string
+	}{
+		{
+			name:  "AM test",
+			clock: &MockClock{hour: 10},
+			want:  "AM",
+		},
+		{
+			name:  "PM test",
+			clock: &MockClock{hour: 14},
+			want:  "PM",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := GetSuffix(tt.clock)
+
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

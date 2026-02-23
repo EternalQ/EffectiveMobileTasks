@@ -1,10 +1,10 @@
 package main_test
 
 import (
-	"errors"
 	"testing"
 
 	main "github.com/EternalQ/eff-mobile-tasks/task5"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -18,58 +18,52 @@ func (m *MockSender) Send(to, body string) error {
 }
 
 func TestNotificationService_Notify(t *testing.T) {
-	sender := new(MockSender)
-	sender.On("Send", "email", "body").Return(nil)
-	sender.On("Send", "", "body").Return(errors.New("wrong email"))
-	sender.On("Send", "email", "").Return(errors.New("empty body"))
-	sender.On("Send", "", "").Return(errors.New("empty params"))
-
 	tests := []struct {
 		name string
 
 		email   string
 		msg     string
-		wantErr bool
+		wantErr error
 	}{
 		{
 			name:    "normal",
 			email:   "email",
 			msg:     "body",
-			wantErr: false,
+			wantErr: nil,
 		},
 		{
 			name:    "empty email",
 			email:   "",
 			msg:     "body",
-			wantErr: true,
+			wantErr: main.ErrWrongInput,
 		},
 		{
 			name:    "empty body",
 			email:   "email",
 			msg:     "",
-			wantErr: true,
+			wantErr: main.ErrWrongInput,
 		},
 		{
 			name:    "empty params",
 			email:   "",
 			msg:     "",
-			wantErr: true,
+			wantErr: main.ErrWrongInput,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := main.NewNotificationSercice(sender)
+			sender := new(MockSender)
+			if tt.wantErr == nil {
+				sender.On("Send", tt.email, tt.msg).Return(tt.wantErr)
+			}
+
+			s := main.NewNotificationService(sender)
 			gotErr := s.Notify(tt.email, tt.msg)
-			if gotErr != nil {
-				if !tt.wantErr {
-					t.Errorf("Notify() failed: %v", gotErr)
-				}
-				return
-			}
-			if tt.wantErr {
-				t.Fatal("Notify() succeeded unexpectedly")
-			}
+
+			assert.Equal(t, tt.wantErr, gotErr)
+
+			sender.AssertExpectations(t)
 		})
 	}
 }
