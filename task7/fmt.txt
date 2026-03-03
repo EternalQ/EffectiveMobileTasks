@@ -1,0 +1,3 @@
+go fmt -x ./...
+/usr/local/go/bin/gofmt -l -w main.go docs/docs.go pkg/api/server.go pkg/db/subscription_repo.go pkg/models/subscription.go pkg/service/subscription.go
+main.go

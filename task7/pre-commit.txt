@@ -1,0 +1,20 @@
+go fmt...................................................................Passed
+go vet...................................................................Passed
+golangci-lint............................................................Passed
+go-unit-tests............................................................Passed
+go-mod-tidy..............................................................Passed
+
+
+
+git commit --amend
+[INFO] Initializing environment for https://github.com/dnephin/pre-commit-golang.
+go fmt...............................................(no files to check)Skipped
+go vet...............................................(no files to check)Skipped
+golangci-lint........................................(no files to check)Skipped
+go-unit-tests........................................(no files to check)Skipped
+go-mod-tidy..........................................(no files to check)Skipped
+[main 2c99ef9] task7 update
+ Date: Tue Mar 3 19:11:35 2026 +0300
+ 7 files changed, 126 insertions(+), 22 deletions(-)
+ create mode 100644 .pre-commit-config.yaml
+ create mode 100644 pkg/models/subscription_test.go

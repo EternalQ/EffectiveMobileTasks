@@ -1,0 +1,15 @@
+golangci-lint run
+main.go:84:21: Error return value of `http.ListenAndServe` is not checked (errcheck)
+        http.ListenAndServe(":8080", router)
+                           ^
+pkg/api/server.go:81:27: Error return value of `(*encoding/json.Encoder).Encode` is not checked (errcheck)
+        json.NewEncoder(w).Encode(map[string]int{"id": sub.Id})
+                                 ^
+pkg/api/server.go:106:27: Error return value of `(*encoding/json.Encoder).Encode` is not checked (errcheck)
+        json.NewEncoder(w).Encode(subs)
+                                 ^
+pkg/api/server.go:143:27: Error return value of `(*encoding/json.Encoder).Encode` is not checked (errcheck)
+        json.NewEncoder(w).Encode(sub)
+                                 ^
+4 issues:
+* errcheck: 4

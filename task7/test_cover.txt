@@ -1,0 +1,7 @@
+go test ./... -cover
+        github.com/EternalQ/effective-mobile-test               coverage: 0.0% of statements
+        github.com/EternalQ/effective-mobile-test/docs          coverage: 0.0% of statements
+        github.com/EternalQ/effective-mobile-test/pkg/api               coverage: 0.0% of statements
+        github.com/EternalQ/effective-mobile-test/pkg/db                coverage: 0.0% of statements
+ok      github.com/EternalQ/effective-mobile-test/pkg/models    0.004s  coverage: 64.3% of statements
+        github.com/EternalQ/effective-mobile-test/pkg/service           coverage: 0.0% of statements

@@ -1,0 +1,8 @@
+❯ go test ./... -bench .
+?       github.com/EternalQ/effective-mobile-test       [no test files]
+?       github.com/EternalQ/effective-mobile-test/docs  [no test files]
+?       github.com/EternalQ/effective-mobile-test/pkg/api       [no test files]
+?       github.com/EternalQ/effective-mobile-test/pkg/db        [no test files]
+PASS
+ok      github.com/EternalQ/effective-mobile-test/pkg/models    0.003s
+?       github.com/EternalQ/effective-mobile-test/pkg/service   [no test files]
