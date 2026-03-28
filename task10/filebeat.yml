@@ -1,0 +1,20 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      host: "tcp://host.docker.internal:2375"
+      hints.enabled: true
+      # templates:
+      #   - config:
+      #       - type: container
+      #         paths:
+      #           - "/var/lib/docker/containers/${data.docker.container.id}/*.log"
+      #         json.keys_under_root: true
+      #         json.add_error_key: true
+      #         json.overwrite_keys: true
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+
+processors:
+  - add_docker_metadata:
+      host: "tcp://host.docker.internal:2375"
