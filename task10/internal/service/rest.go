@@ -60,9 +60,11 @@ func (s *RestService) SetupRouter() *mux.Router {
 }
 
 func (s *RestService) jsonResp(w http.ResponseWriter, code int, v any) {
-	w.WriteHeader(code)
 	if v != nil {
 		w.Header().Set("Content-Type", "application/json")
+	}
+	w.WriteHeader(code)
+	if v != nil {
 		if err := json.NewEncoder(w).Encode(v); err != nil {
 			s.log.Error("rest encode error: ", "err", err)
 		}

@@ -22,11 +22,11 @@ func (s *RestService) handleWs(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
+	if err := ws.WriteMessage(websocket.TextMessage, []byte("usage: /add <name>")); err != nil {
+		log.Println("Ошибка первой записи:", err)
+		return
+	}
 	for {
-		if err := ws.WriteMessage(websocket.TextMessage, []byte("usage: /add <name>")); err != nil {
-			log.Println("Ошибка первой записи:", err)
-			break
-		}
 		t, p, err := ws.ReadMessage()
 		if err != nil {
 			log.Println("Ошибка чтения:", err)
@@ -35,7 +35,7 @@ func (s *RestService) handleWs(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Получено: %s", p)
 
 		msg := string(p)
-		if strings.HasPrefix(msg, "/add") {
+		if strings.HasPrefix(msg, "/add ") {
 			name := strings.TrimPrefix(msg, "/add ")
 			if name != "" {
 				s.register(&models.User{Name: name})
