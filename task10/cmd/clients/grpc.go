@@ -18,6 +18,8 @@ import (
 type GrpcClient struct {
 	client pb.UserServiceClient
 	ctx    context.Context
+
+	conn *grpc.ClientConn
 }
 
 func NewGrpcClient(addr string) (*GrpcClient, error) {
@@ -29,7 +31,12 @@ func NewGrpcClient(addr string) (*GrpcClient, error) {
 	return &GrpcClient{
 		client: pb.NewUserServiceClient(conn),
 		ctx:    context.Background(),
+		conn:   conn,
 	}, nil
+}
+
+func (c *GrpcClient) Close() {
+	c.conn.Close()
 }
 
 func (c *GrpcClient) Run() {

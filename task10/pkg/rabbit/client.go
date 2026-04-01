@@ -41,8 +41,8 @@ func NewClient(host, exchange string) *RabbitClient {
 }
 
 func (c *RabbitClient) Close() {
-	c.conn.Close()
 	c.ch.Close()
+	c.conn.Close()
 }
 
 func (c *RabbitClient) Pub(msg string) error {

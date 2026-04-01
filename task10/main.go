@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"log/slog"
 	"net"
 	"net/http"
@@ -55,7 +56,10 @@ func main() {
 	}()
 
 	rmq := rabbit.NewClient(rmqHost, notifExch)
+	defer rmq.Close()
 
 	rest := service.NewRestService(logger, rmq).SetupRouter()
-	http.ListenAndServe(":"+restPort, rest)
+	if err := http.ListenAndServe(":"+restPort, rest); err != nil {
+		log.Fatal(err)
+	}
 }

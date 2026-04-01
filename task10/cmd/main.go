@@ -46,20 +46,22 @@ func main() {
 		if err != nil {
 			log.Fatalf("Ошибка подключения: %v", err)
 		}
+		defer c.Close()
 		c.Run()
 	case "2":
 		clients.NewWsClient("localhost:" + restPort).Run()
 	case "3":
 		c := rabbit.NewClient(rmqHost, notifExch)
+		defer c.Close()
 		msgs, err := c.Sub()
 		if err != nil {
 			log.Fatalf("Ошибка подключения: %v", err)
 		}
-		for {
-			d := <-msgs
+		for d := range msgs {
 			fmt.Printf("[%v] Notif: %s\n", d.Timestamp, d.Body)
 			time.Sleep(100 * time.Millisecond)
 		}
+		fmt.Println("Канал закрыт")
 	case "4":
 		c := clients.NewRestClient("localhost:" + restPort)
 		c.Run()

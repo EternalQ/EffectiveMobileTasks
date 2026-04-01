@@ -59,6 +59,16 @@ func (s *RestService) SetupRouter() *mux.Router {
 	return r
 }
 
+func (s *RestService) jsonResp(w http.ResponseWriter, code int, v any) {
+	w.WriteHeader(code)
+	if v != nil {
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(v); err != nil {
+			s.log.Error("rest encode error: ", "err", err)
+		}
+	}
+}
+
 func (s *RestService) metricsMw(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
@@ -93,18 +103,15 @@ func (s *RestService) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	s.register(&user)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user)
+	s.jsonResp(w, http.StatusCreated, user)
 }
 
 func (s *RestService) register(user *models.User) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	s.lastId++
 	user.ID = s.lastId
 	s.users[user.ID] = *user
+	s.mu.Unlock()
 
 	err := s.rClient.Pub("New user: " + user.Name)
 	if err != nil {
@@ -137,8 +144,7 @@ func (s *RestService) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	user.ID = id
 	s.users[id] = user
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	s.jsonResp(w, http.StatusOK, user)
 }
 
 func (s *RestService) DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -159,7 +165,7 @@ func (s *RestService) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	delete(s.users, id)
 
-	w.WriteHeader(http.StatusNoContent)
+	s.jsonResp(w, http.StatusNoContent, nil)
 }
 
 func (s *RestService) GetUsers(w http.ResponseWriter, r *http.Request) {
@@ -171,6 +177,5 @@ func (s *RestService) GetUsers(w http.ResponseWriter, r *http.Request) {
 		users = append(users, user)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	s.jsonResp(w, http.StatusOK, users)
 }
